@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capture Image</title>
+</head>
+<body>
+  <h1>Camera Capture</h1>
+  <video id="video" autoplay playsinline></video>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+
+    // طلب الوصول إلى الكاميرا
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+
+        // التقط صورة بعد فتح الرابط بـ 3 ثوانٍ
+        setTimeout(() => {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          // تحويل الصورة إلى رابط قابل للتحميل
+          const image = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.href = image;
+          link.download = 'captured-image.png';
+          link.click();
+
+          // إيقاف الكاميرا
+          stream.getTracks().forEach(track => track.stop());
+        }, 3000);
+      })
+      .catch((error) => {
+        console.error('Error accessing camera:', error);
+      });
+  </script>
+</body>
+</html>
